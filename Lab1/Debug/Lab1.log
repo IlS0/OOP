@@ -1,0 +1,29 @@
+﻿  BigInt.cpp
+  Main.cpp
+  Создание кода...
+D:\c++\OOP\Lab1\BigInt.cpp(17): error C4716: BigInt::operator++: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(19): error C4716: BigInt::operator++: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(13): error C4716: BigInt::operator=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(15): error C4716: BigInt::operator~: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(23): error C4716: BigInt::operator--: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(21): error C4716: BigInt::operator--: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(25): error C4716: BigInt::operator+=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(27): error C4716: BigInt::operator-=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(28): error C4716: BigInt::operator/=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(29): error C4716: BigInt::operator^=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(30): error C4716: BigInt::operator%=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(31): error C4716: BigInt::operator&=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(32): error C4716: BigInt::operator|=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(34): error C4716: BigInt::operator+: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(35): error C4716: BigInt::operator-: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(37): error C4716: BigInt::operator==: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(38): error C4716: BigInt::operator!=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(39): error C4716: BigInt::operator<: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(40): error C4716: BigInt::operator>: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(41): error C4716: BigInt::operator<=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(42): error C4716: BigInt::operator>=: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(44): error C4716: BigInt::operator int: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(45): error C4716: BigInt::operator std::basic_string<char,std::char_traits<char>,std::allocator<char> >: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(47): error C4716: BigInt::size: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(61): error C4716: operator<<: должна возвращать значение
+D:\c++\OOP\Lab1\BigInt.cpp(26): error C4716: BigInt::operator*=: должна возвращать значение
