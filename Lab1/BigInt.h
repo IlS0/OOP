@@ -1,15 +1,15 @@
-#pragma once
+п»ї#pragma once
 #include <string>
 
 class BigInt {
 public:
 	BigInt();
 	BigInt(int);
-	BigInt(std::string); // бросать исключение std::invalid_argument при ошибке
+	BigInt(std::string); // ГЎГ°Г®Г±Г ГІГј ГЁГ±ГЄГ«ГѕГ·ГҐГ­ГЁГҐ std::invalid_argument ГЇГ°ГЁ Г®ГёГЁГЎГЄГҐ
 	BigInt(const BigInt&);
 	~BigInt();
 
-	BigInt& operator=(const BigInt&);  //возможно присваивание самому себе!
+	BigInt& operator=(const BigInt&);  //ГўГ®Г§Г¬Г®Г¦Г­Г® ГЇГ°ГЁГ±ГўГ ГЁГўГ Г­ГЁГҐ Г±Г Г¬Г®Г¬Гі Г±ГҐГЎГҐ!
 
 	BigInt operator~() const;
 
@@ -41,6 +41,10 @@ public:
 	operator std::string() const;
 
 	size_t size() const;  // size in bytes
+
+private:
+	std::string value;
+	bool isNegative;
 };
 
 BigInt operator+(const BigInt&, const BigInt&);
@@ -54,4 +58,3 @@ BigInt operator|(const BigInt&, const BigInt&);
 
 
 std::ostream& operator<<(std::ostream& o, const BigInt& i);
-
