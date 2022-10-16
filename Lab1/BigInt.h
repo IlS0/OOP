@@ -42,7 +42,7 @@ public:
 
 	size_t size() const;  // size in bytes
 
-private:
+//private:
 	std::string value;
 	bool isNegative;
 };
