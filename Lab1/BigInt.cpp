@@ -37,8 +37,13 @@ BigInt::~BigInt()
 
 }
 
-//BigInt& BigInt:: operator=(const BigInt&) {}
-//
+BigInt& BigInt:: operator=(const BigInt& n)
+{
+	this->isNegative = n.isNegative;
+	this->value = n.value;
+	return *this;
+}
+
 //BigInt BigInt::operator~() const {}
 //
 //BigInt& BigInt::operator++() {}
@@ -57,10 +62,21 @@ BigInt::~BigInt()
 //BigInt& BigInt::operator%=(const BigInt&) {}
 //BigInt& BigInt::operator&=(const BigInt&) {}
 //BigInt& BigInt::operator|=(const BigInt&) {}
-//
-//BigInt BigInt::operator+() const {}  // unary +
-//BigInt BigInt::operator-() const {}  // unary -
-//
+
+// unary +
+BigInt BigInt::operator+() const
+{
+	return *this;
+}
+
+// unary -
+BigInt BigInt::operator-() const
+{
+	BigInt n = BigInt(this->value);
+	n.isNegative = !(this->isNegative);
+	return n;
+}
+
 bool BigInt::operator==(const BigInt& n) const
 {
 	return (n.isNegative == this->isNegative && (this->value == n.value));
@@ -149,10 +165,24 @@ bool BigInt::operator>=(const BigInt& n) const
 {
 	return !(this->operator<(n));
 }
-//
-//BigInt::operator int() const {}
-//BigInt::operator std::string() const {}
-//
+
+BigInt::operator int() const
+{
+	int n = std::stoi(this->value);
+	if (this->isNegative)
+		return -n;
+	else 
+		return n;
+}
+
+BigInt::operator std::string() const
+{
+	if (this->isNegative)
+		return ("-" + this->value);
+	else
+		return this->value;
+}
+
 size_t BigInt::size() const
 {
 	return sizeof(isNegative) + this->value.size();
