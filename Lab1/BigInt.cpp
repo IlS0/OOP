@@ -91,22 +91,20 @@ bool BigInt::operator<(const BigInt& n) const
 {
 	unsigned int nLen{ n.value.length() }, thisLen{ this->value.length() }; //мб убрать ансайнд
 	if (thisLen < nLen && n.isNegative == this->isNegative) {
-		if (n.isNegative)
-			return false;
-		else
-			return true;
+		return (n.isNegative) ? false : true;
 	}
 	else if (thisLen == nLen && n.isNegative == this->isNegative) {
 		for (unsigned int i{ 0 }; i < nLen; ++i) {
 			if (this->value[i] < n.value[i]) {
-				if (n.isNegative)
-					return false;
-				else
-					return true;
+				return (n.isNegative) ? false : true;
 			}
 		}
 	}
-	else if (this->isNegative == true) {
+	//либо 1 >2 по длине,либо разные знаки
+	else if (thisLen > nLen && n.isNegative == this->isNegative) {
+		return (n.isNegative) ? true : false;
+	}
+	else if (this->isNegative) {
 		return true;
 	}
 	return false;
@@ -114,45 +112,24 @@ bool BigInt::operator<(const BigInt& n) const
 
 bool BigInt::operator>(const BigInt& n) const 
 {	
-	if (this->operator==(n))
-		return false;
-
 	unsigned int nLen{ n.value.length() }, thisLen{ this->value.length() }; //мб убрать ансайнд
 	if (thisLen > nLen && n.isNegative == this->isNegative) {
-		if (n.isNegative)
-			return false;
-		else
-			return true;
+		return (n.isNegative) ? false : true;
 	}
 	else if (thisLen == nLen && n.isNegative == this->isNegative) {
 		for (unsigned int i{ 0 }; i < nLen; ++i) {
 			if (this->value[i] > n.value[i]) {
-				if (n.isNegative)
-					return false;
-				else
-					return true;
+				return (n.isNegative) ? false : true;
 			}
 		}
-		if (!n.isNegative)
-			return false;
-		else
-			return true;
 	}
-
-	else if (n.isNegative != this->isNegative) {
-		if (this->isNegative == false) {
-			return true;
-		}
-		else
-			return false;
+	//либо 1 < 2 по длине,либо разные знаки
+	else if (thisLen < nLen && n.isNegative == this->isNegative) {
+		return (n.isNegative) ? true : false;
 	}
-
-	else if(thisLen < nLen)
-		if (!n.isNegative)
-			return false;
-		else
-			return true;
-	
+	else if (n.isNegative) {
+		return true;
+	}
 	return false;
 }
 
@@ -169,24 +146,19 @@ bool BigInt::operator>=(const BigInt& n) const
 BigInt::operator int() const
 {
 	int n = std::stoi(this->value);
-	if (this->isNegative)
-		return -n;
-	else 
-		return n;
+	return (this->isNegative) ? (-n) : n;
 }
 
 BigInt::operator std::string() const
 {
-	if (this->isNegative)
-		return ("-" + this->value);
-	else
-		return this->value;
+	return (this->isNegative) ? ("-" + this->value) : this->value;
 }
 
 size_t BigInt::size() const
 {
 	return sizeof(isNegative) + this->value.size();
 }
+
 //
 //BigInt operator+(const BigInt&, const BigInt&) {}
 //BigInt operator-(const BigInt&, const BigInt&) {}
@@ -200,6 +172,7 @@ size_t BigInt::size() const
 
 std::ostream& operator<<(std::ostream& o, const BigInt& i) 
 {
-	if (i.isNegative) {o << '-';}
-	return o << i.value;
+	//if (i.isNegative) {o << '-';}
+	//return o << i.value;
+	return (i.isNegative) ? (o << '-' << i.value) : (o << i.value);
 }
