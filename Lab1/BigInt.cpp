@@ -45,18 +45,139 @@ BigInt& BigInt:: operator=(const BigInt& n)
 }
 
 //BigInt BigInt::operator~() const {}
-//
-//BigInt& BigInt::operator++() {}
-//
+
+BigInt& BigInt::operator++() 
+{
+	return *this += 1;
+}
+
 //const BigInt BigInt::operator++(int) const {}
-//
-//BigInt& BigInt::operator--() {}
-//
+
+BigInt& BigInt::operator--() 
+{
+	return *this -= 1;
+}
+
 //const BigInt BigInt::operator--(int) const {}
-//
-//BigInt& BigInt::operator+=(const BigInt&) {}
+
+BigInt& BigInt::operator+=(const BigInt& n) 
+{
+	//если разные знаки
+	if (this->isNegative && n.isNegative==false) {
+		return (const_cast<BigInt&>(n) -= -(*this));///?????
+	}
+	else if (this->isNegative == false && n.isNegative) {
+		return *this -= (-n);
+	}
+
+	//вариант для беззнаковых чисел
+	int thisLen = this->value.length(), nLen = n.value.length(), lim{ 0 };
+	std::string buf{}, a{}, b{};
+
+	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {
+		a.append("0");
+	}
+
+	if (thisLen < nLen) {
+		a += this->value;
+		b = n.value;
+		lim = nLen;
+	}
+	else {
+		a += n.value;
+		b = this->value;
+		lim = thisLen;
+	}
+
+	
+	//сложение "в тупую". всё в char
+	for (int i{ 0 }; i < lim; ++i) {
+		buf+=((b[i]-'0') + (a[i]-'0'));
+	}
+
+	//работа с переносами
+	for (int i= lim - 1 ; i >= 0; --i) {
+		if (buf[i] > 9) {
+			if (i - 1 < 0) {
+				buf = " " + buf;
+				buf[i] -= 31;//костыль
+				++i;
+			}
+			else {
+				++buf[i - 1];
+			}
+			buf[i] -= 10;
+		}
+	}
+
+	//приведение в читабельный вид вместо stoi, тк может встретиться \0 
+	int bufLen = buf.length();
+	for (int i = 0; i < bufLen; ++i) {
+		buf[i]=((buf[i])+'0');
+	}
+	this->value = buf;
+
+	return *this;
+}
+
 //BigInt& BigInt::operator*=(const BigInt&) {}
-//BigInt& BigInt::operator-=(const BigInt&) {}
+
+BigInt& BigInt::operator-=(const BigInt& n) 
+{	
+	if (this->isNegative == false && n.isNegative) {
+		return *this += -n;
+	}
+	else if (this->isNegative && n.isNegative == false) {
+		return const_cast<BigInt&>(n) -= -(*this);
+	}
+
+
+	//вариант для беззнаковых чисел
+	int thisLen = this->value.length(), nLen = n.value.length(), lim{ 0 };
+	std::string buf{}, a{}, b{};
+
+	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {
+		a.append("0");
+	}
+
+	if (thisLen < nLen) {
+		a += this->value;
+		b = n.value;
+		lim = nLen;
+	}
+	else {
+		a += n.value;
+		b = this->value;
+		lim = thisLen;
+	}
+
+	//вычисления и переносы
+	for (int i = lim - 1; i >= 0; --i) {
+
+		if (b[i] - '0' >= a[i] - '0') {
+			buf += (b[i] - '0') - (a[i] - '0');
+		}
+		else {
+			--b[i - 1];
+			b[i] =b[i]+ 10;
+			buf += (b[i] - '0') - (a[i] - '0');
+		}
+	}
+
+	int bufLen = buf.length();
+	for (int i = 0; i < bufLen; ++i) {
+		buf[i] = ((buf[i]) + '0');
+	}
+
+	//на случай, если останется 0 в начале. такое случается при вычитании однозначного из двухзначного
+	while (buf.back()=='0') {
+		buf.pop_back();
+	}
+	reverse(buf.begin(), buf.end());
+	this->value = buf;
+
+	return *this;
+}
 //BigInt& BigInt::operator/=(const BigInt&) {}
 //BigInt& BigInt::operator^=(const BigInt&) {}
 //BigInt& BigInt::operator%=(const BigInt&) {}
