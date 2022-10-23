@@ -53,7 +53,9 @@ BigInt& BigInt::operator++()
 
 const BigInt BigInt::operator++(int) const 
 {
-	return ++(const_cast<BigInt&>(*this));
+	BigInt tmp = BigInt(*this);
+	++(const_cast<BigInt&>(*this));
+	return tmp;
 }
 
 BigInt& BigInt::operator--() 
@@ -63,7 +65,9 @@ BigInt& BigInt::operator--()
 
 const BigInt BigInt::operator--(int) const 
 {
-	return --(const_cast<BigInt&>(*this));
+	BigInt tmp = BigInt(*this);
+	--(const_cast<BigInt&>(*this));
+	return tmp;
 }
 
 BigInt& BigInt::operator+=(const BigInt& n) 
@@ -120,7 +124,17 @@ BigInt& BigInt::operator+=(const BigInt& n)
 	return *this;
 }
 
-//BigInt& BigInt::operator*=(const BigInt&) {}
+BigInt& BigInt::operator*=(const BigInt& n) 
+{
+	BigInt res = BigInt(0);
+	BigInt fst = (this->isNegative) ? -(*this) : *this;
+	BigInt lim = (n.isNegative) ? -n : n;
+	for (int i{ 0 }; i < lim; ++i) {
+		res += fst;
+	}
+	*this = (this->isNegative!=n.isNegative ) ? -res : res;
+	return *this;
+}
 
 BigInt& BigInt::operator-=(const BigInt& n)
 {
@@ -178,7 +192,16 @@ BigInt& BigInt::operator-=(const BigInt& n)
 	return *this;
 }
 
-//BigInt& BigInt::operator/=(const BigInt&) {}
+BigInt& BigInt::operator/=(const BigInt& n) 
+{
+	BigInt cnt = BigInt(0);
+	BigInt fst = (this->isNegative) ? -(*this) : *this;
+	BigInt snd = (n.isNegative) ? -n : n;
+
+	while (0 <= (fst -= snd)) {++cnt;}
+	*this = (this->isNegative != n.isNegative) ? -cnt : cnt;
+	return *this;
+}
 //BigInt& BigInt::operator^=(const BigInt&) {}
 //BigInt& BigInt::operator%=(const BigInt&) {}
 //BigInt& BigInt::operator&=(const BigInt&) {}
@@ -290,8 +313,27 @@ BigInt operator-(const BigInt& a , const BigInt& b)
 	return BigInt(a) -= b;
 }
 
-//BigInt operator*(const BigInt&, const BigInt&) {}
-//BigInt operator/(const BigInt&, const BigInt&) {}
+BigInt operator*(const BigInt& a, const BigInt& b) 
+{
+	BigInt res = BigInt(0);
+	BigInt fst = (a.isNegative) ? -a : a;
+	BigInt lim = (b.isNegative) ? -b : b;
+
+	for (int i{ 0 }; i < lim; ++i) {
+		res += fst;
+	}
+	return (a.isNegative != b.isNegative) ? -res : res;
+}
+
+BigInt operator/(const BigInt& a, const BigInt& b) 
+{
+	BigInt cnt = BigInt(0);
+	BigInt fst = (a.isNegative) ? -a : a;
+	BigInt snd = (b.isNegative) ? -b : b;
+
+	while (0 <= (fst -= snd)) {++cnt;}
+	return (a.isNegative != b.isNegative) ? -cnt : cnt;
+}
 //BigInt operator^(const BigInt&, const BigInt&) {}
 //BigInt operator%(const BigInt&, const BigInt&) {}
 //BigInt operator&(const BigInt&, const BigInt&) {}
