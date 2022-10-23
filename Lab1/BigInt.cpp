@@ -51,32 +51,37 @@ BigInt& BigInt::operator++()
 	return *this += 1;
 }
 
-//const BigInt BigInt::operator++(int) const {}
+const BigInt BigInt::operator++(int) const 
+{
+	return ++(const_cast<BigInt&>(*this));
+}
 
 BigInt& BigInt::operator--() 
 {
 	return *this -= 1;
 }
 
-//const BigInt BigInt::operator--(int) const {}
+const BigInt BigInt::operator--(int) const 
+{
+	return --(const_cast<BigInt&>(*this));
+}
 
 BigInt& BigInt::operator+=(const BigInt& n) 
 {
 	//если разные знаки
-	if (this->isNegative && n.isNegative==false) {
-		return (const_cast<BigInt&>(n) -= -(*this));///?????
-	}
-	else if (this->isNegative == false && n.isNegative) {
+	if (this->isNegative == false && n.isNegative) {
 		return *this -= (-n);
+	}
+	else if (this->isNegative && n.isNegative==false) {
+		*this = (const_cast<BigInt&>(n) -= -(*this));///?????
+		return *this;
 	}
 
 	//вариант для беззнаковых чисел
 	int thisLen = this->value.length(), nLen = n.value.length(), lim{ 0 };
 	std::string buf{}, a{}, b{};
 
-	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {
-		a.append("0");
-	}
+	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {a.append("0");}
 
 	if (thisLen < nLen) {
 		a += this->value;
@@ -88,12 +93,9 @@ BigInt& BigInt::operator+=(const BigInt& n)
 		b = this->value;
 		lim = thisLen;
 	}
-
 	
 	//сложение "в тупую". всё в char
-	for (int i{ 0 }; i < lim; ++i) {
-		buf+=((b[i]-'0') + (a[i]-'0'));
-	}
+	for (int i{ 0 }; i < lim; ++i) {buf+=((b[i]-'0') + (a[i]-'0'));}
 
 	//работа с переносами
 	for (int i= lim - 1 ; i >= 0; --i) {
@@ -112,9 +114,7 @@ BigInt& BigInt::operator+=(const BigInt& n)
 
 	//приведение в читабельный вид вместо stoi, тк может встретиться \0 
 	int bufLen = buf.length();
-	for (int i = 0; i < bufLen; ++i) {
-		buf[i]=((buf[i])+'0');
-	}
+	for (int i = 0; i < bufLen; ++i) {buf[i]=((buf[i])+'0');}
 	this->value = buf;
 
 	return *this;
@@ -122,25 +122,25 @@ BigInt& BigInt::operator+=(const BigInt& n)
 
 //BigInt& BigInt::operator*=(const BigInt&) {}
 
-BigInt& BigInt::operator-=(const BigInt& n) 
-{	
-	if (this->isNegative == false && n.isNegative) {
+BigInt& BigInt::operator-=(const BigInt& n)
+{
+	//если разные знаки
+	if (this->isNegative != n.isNegative) {
 		return *this += -n;
 	}
-	else if (this->isNegative && n.isNegative == false) {
-		return const_cast<BigInt&>(n) -= -(*this);
+	// если оба отрицательные
+	else if (this->isNegative) {
+		*this = (-n) -= -(*this);
+		return *this;
 	}
-
 
 	//вариант для беззнаковых чисел
 	int thisLen = this->value.length(), nLen = n.value.length(), lim{ 0 };
 	std::string buf{}, a{}, b{};
 
-	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {
-		a.append("0");
-	}
+	for (int i{ 0 }; i < abs(nLen - thisLen); ++i) {a.append("0");}
 
-	if (thisLen < nLen) {
+	if (thisLen < nLen || (thisLen == nLen && *this < n)) {
 		a += this->value;
 		b = n.value;
 		lim = nLen;
@@ -151,9 +151,8 @@ BigInt& BigInt::operator-=(const BigInt& n)
 		lim = thisLen;
 	}
 
-	//вычисления и переносы
+	//вычисления и переносы b-a
 	for (int i = lim - 1; i >= 0; --i) {
-
 		if (b[i] - '0' >= a[i] - '0') {
 			buf += (b[i] - '0') - (a[i] - '0');
 		}
@@ -165,19 +164,20 @@ BigInt& BigInt::operator-=(const BigInt& n)
 	}
 
 	int bufLen = buf.length();
-	for (int i = 0; i < bufLen; ++i) {
-		buf[i] = ((buf[i]) + '0');
-	}
+	for (int i = 0; i < bufLen; ++i) {buf[i] = ((buf[i]) + '0');}
 
 	//на случай, если останется 0 в начале. такое случается при вычитании однозначного из двухзначного
-	while (buf.back()=='0') {
-		buf.pop_back();
-	}
+	while (&buf.front()!=&buf.back() && buf.back()=='0') {buf.pop_back();}
 	reverse(buf.begin(), buf.end());
+
+	//уточнение знака
+	if (*this < n) {this->isNegative = true;}
+
 	this->value = buf;
 
 	return *this;
 }
+
 //BigInt& BigInt::operator/=(const BigInt&) {}
 //BigInt& BigInt::operator^=(const BigInt&) {}
 //BigInt& BigInt::operator%=(const BigInt&) {}
@@ -280,9 +280,16 @@ size_t BigInt::size() const
 	return sizeof(isNegative) + this->value.size();
 }
 
-//
-//BigInt operator+(const BigInt&, const BigInt&) {}
-//BigInt operator-(const BigInt&, const BigInt&) {}
+BigInt operator+(const BigInt& a, const BigInt& b) 
+{
+	return BigInt(a) += b;
+}
+
+BigInt operator-(const BigInt& a , const BigInt& b) 
+{
+	return BigInt(a) -= b;
+}
+
 //BigInt operator*(const BigInt&, const BigInt&) {}
 //BigInt operator/(const BigInt&, const BigInt&) {}
 //BigInt operator^(const BigInt&, const BigInt&) {}
@@ -290,10 +297,7 @@ size_t BigInt::size() const
 //BigInt operator&(const BigInt&, const BigInt&) {}
 //BigInt operator|(const BigInt&, const BigInt&) {}
 
-
 std::ostream& operator<<(std::ostream& o, const BigInt& i) 
 {
-	//if (i.isNegative) {o << '-';}
-	//return o << i.value;
 	return (i.isNegative) ? (o << '-' << i.value) : (o << i.value);
 }
