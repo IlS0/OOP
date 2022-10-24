@@ -194,16 +194,25 @@ BigInt& BigInt::operator-=(const BigInt& n)
 
 BigInt& BigInt::operator/=(const BigInt& n) 
 {
+	if (n == BigInt(0)) throw std::invalid_argument("Division by zero.");
 	BigInt cnt = BigInt(0);
 	BigInt fst = (this->isNegative) ? -(*this) : *this;
 	BigInt snd = (n.isNegative) ? -n : n;
 
-	while (0 <= (fst -= snd)) {++cnt;}
+	while (BigInt(0) <= (fst -= snd)) {++cnt;}
 	*this = (this->isNegative != n.isNegative) ? -cnt : cnt;
 	return *this;
 }
+
 //BigInt& BigInt::operator^=(const BigInt&) {}
-//BigInt& BigInt::operator%=(const BigInt&) {}
+
+BigInt& BigInt::operator%=(const BigInt& n) 
+{
+	*this = (*this)-(n*(*this / n));
+	return *this;
+
+}
+
 //BigInt& BigInt::operator&=(const BigInt&) {}
 //BigInt& BigInt::operator|=(const BigInt&) {}
 
@@ -233,14 +242,19 @@ bool BigInt::operator!=(const BigInt& n) const
 
 bool BigInt::operator<(const BigInt& n) const 
 {
-	unsigned int nLen{ n.value.length() }, thisLen{ this->value.length() }; //мб убрать ансайнд
+	//пофиксить 50<48 == 1 kek
+	int nLen= n.value.length(), thisLen= this->value.length(); 
 	if (thisLen < nLen && n.isNegative == this->isNegative) {
 		return (n.isNegative) ? false : true;
 	}
 	else if (thisLen == nLen && n.isNegative == this->isNegative) {
-		for (unsigned int i{ 0 }; i < nLen; ++i) {
+
+		for (int i{ 0 }; i < nLen; ++i) {
 			if (this->value[i] < n.value[i]) {
 				return (n.isNegative) ? false : true;
+			}
+			else if (this->value[i] > n.value[i]) {
+				return (n.isNegative) ? true : false;
 			}
 		}
 	}
@@ -256,14 +270,17 @@ bool BigInt::operator<(const BigInt& n) const
 
 bool BigInt::operator>(const BigInt& n) const 
 {	
-	unsigned int nLen{ n.value.length() }, thisLen{ this->value.length() }; //мб убрать ансайнд
+	int nLen= n.value.length() , thisLen= this->value.length(); 
 	if (thisLen > nLen && n.isNegative == this->isNegative) {
 		return (n.isNegative) ? false : true;
 	}
 	else if (thisLen == nLen && n.isNegative == this->isNegative) {
-		for (unsigned int i{ 0 }; i < nLen; ++i) {
+		for (int i{ 0 }; i < nLen; ++i) {
 			if (this->value[i] > n.value[i]) {
 				return (n.isNegative) ? false : true;
+			}
+			else if(this->value[i] < n.value[i]){
+				return (n.isNegative) ? true : false;
 			}
 		}
 	}
@@ -327,15 +344,23 @@ BigInt operator*(const BigInt& a, const BigInt& b)
 
 BigInt operator/(const BigInt& a, const BigInt& b) 
 {
+	if (b == BigInt(0)) throw std::invalid_argument("Division by zero.");
 	BigInt cnt = BigInt(0);
 	BigInt fst = (a.isNegative) ? -a : a;
 	BigInt snd = (b.isNegative) ? -b : b;
 
-	while (0 <= (fst -= snd)) {++cnt;}
+	while (BigInt(0) <= (fst -= snd)) {++cnt;}
 	return (a.isNegative != b.isNegative) ? -cnt : cnt;
 }
+
 //BigInt operator^(const BigInt&, const BigInt&) {}
-//BigInt operator%(const BigInt&, const BigInt&) {}
+
+BigInt operator%(const BigInt& a, const BigInt& b) 
+{
+	BigInt res = BigInt(a - (b * (a / b)));
+	return res;
+}
+
 //BigInt operator&(const BigInt&, const BigInt&) {}
 //BigInt operator|(const BigInt&, const BigInt&) {}
 
