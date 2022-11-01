@@ -58,3 +58,6 @@ BigInt operator|(const BigInt&, const BigInt&);
 
 
 std::ostream& operator<<(std::ostream& o, const BigInt& i);
+
+std::string toBin(const BigInt& n);
+BigInt toDec(const std::string n);

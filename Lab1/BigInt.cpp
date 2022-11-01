@@ -37,6 +37,40 @@ BigInt::~BigInt()
 
 }
 
+std::string toBin(const BigInt& n)
+{
+	BigInt tmp = n;
+	BigInt BI_zero = BigInt(0), BI_two = BigInt(2);
+	std::string binNum{};
+
+	while (tmp != BI_zero) {
+		binNum.push_back((tmp.value.back() % 2)+'0');
+		tmp /= BI_two;
+	}
+
+	if (!binNum.length())
+		binNum.push_back('0');
+	else 
+		reverse(binNum.begin(), binNum.end());
+	return binNum;
+}
+
+
+BigInt toDec(const std::string n)
+{
+	int bLen= n.length();
+	BigInt pow = BigInt(1),decNum = BigInt(0),BI_two = BigInt(2);
+
+	for (int i{ bLen-2 }; i>=0;--i) {
+		pow *= BI_two;
+		if (n[i]!='0')
+			decNum += pow;
+	}
+	decNum += n[bLen - 1]-'0';
+	return decNum;
+}
+
+
 BigInt& BigInt:: operator=(const BigInt& n)
 {
 	this->isNegative = n.isNegative;
@@ -44,7 +78,16 @@ BigInt& BigInt:: operator=(const BigInt& n)
 	return *this;
 }
 
-//BigInt BigInt::operator~() const {}
+BigInt BigInt::operator~() const 
+{
+	std::string bThis{ toBin(*this) };
+	int len = bThis.length();
+	for (int i{ 0 }; i < len; ++i) {
+		 bThis[i] = ~bThis[i];
+	}
+	BigInt res = BigInt(toDec(bThis));
+	return res;
+}
 
 BigInt& BigInt::operator++() 
 {
@@ -129,10 +172,10 @@ BigInt& BigInt::operator*=(const BigInt& n)
 	BigInt res = BigInt(0);
 	BigInt fst = (this->isNegative) ? -(*this) : *this;
 	BigInt lim = (n.isNegative) ? -n : n;
-	for (int i{ 0 }; i < lim; ++i) {
+	for (int i{ 0 }; i < lim; ++i) { //»Õ“ Ã≈Õ‹ÿ≈ ¡»√»Õ“?!?!!
 		res += fst;
 	}
-	*this = (this->isNegative!=n.isNegative ) ? -res : res;
+	*this = (this->isNegative!=n.isNegative && !(res == BigInt(0))) ? -res : res;
 	return *this;
 }
 
@@ -200,21 +243,102 @@ BigInt& BigInt::operator/=(const BigInt& n)
 	BigInt snd = (n.isNegative) ? -n : n;
 
 	while (BigInt(0) <= (fst -= snd)) {++cnt;}
-	*this = (this->isNegative != n.isNegative) ? -cnt : cnt;
+	*this = (this->isNegative != n.isNegative && !(cnt == BigInt(0))) ? -cnt : cnt;
 	return *this;
 }
 
-//BigInt& BigInt::operator^=(const BigInt&) {}
+BigInt& BigInt::operator^=(const BigInt& n) 
+{
+	std::string bThis{ toBin(*this) }, bNum{ toBin(n) }, bRes{ };
+	int thisLen = bThis.length(), numLen = bNum.length(), maxLen = 0, shift = abs(thisLen - numLen);
+	bool thisIsLonger = false, thisIsNeg = false;
+	if (thisLen > numLen) {
+		maxLen = thisLen;
+		thisIsLonger = true;
+	}
+	else { maxLen = numLen; }
+
+	for (int i{ 0 }; i < maxLen; ++i) {
+		if (i < shift) {
+			if (thisIsLonger)
+				bRes += bThis[i];
+			else
+				bRes += bNum[i];
+		}
+		else {
+			if (thisIsLonger)
+				bRes += (bThis[i] - '0' ^ bNum[i - shift] - '0') + '0';
+			else
+				bRes += (bThis[i - shift] - '0' ^ bNum[i] - '0') + '0';
+		}
+	}
+	if (this->isNegative) thisIsNeg = true;
+	*this = toDec(bRes);
+	this->isNegative = ((thisIsNeg || n.isNegative) && !(thisIsNeg && n.isNegative)) ? true : false;//??? ÁÌ‡Í
+	return *this;
+}
 
 BigInt& BigInt::operator%=(const BigInt& n) 
 {
 	*this = (*this)-(n*(*this / n));
 	return *this;
-
 }
 
-//BigInt& BigInt::operator&=(const BigInt&) {}
-//BigInt& BigInt::operator|=(const BigInt&) {}
+BigInt& BigInt::operator&=(const BigInt& n) 
+{
+	std::string bThis{ toBin(*this) }, bNum{ toBin(n) }, bRes{ };
+	int thisLen = bThis.length(), numLen = bNum.length(),maxLen = 0, shift = abs(thisLen- numLen);
+	bool thisIsLonger = false, thisIsNeg = false;
+	if (thisLen > numLen) {
+		maxLen = thisLen;
+		thisIsLonger = true;
+	}
+	else {maxLen = numLen;}
+
+	for (int i{ shift }; i < maxLen; ++i) {
+		if (thisIsLonger)
+			bRes += (bThis[i]-'0' && bNum[i - shift] - '0')+'0';
+		else 
+			bRes += (bThis[i - shift] - '0' && bNum[i] - '0')+'0';
+	}	
+
+	if (this->isNegative) thisIsNeg = true;
+	*this = toDec(bRes);
+	this->isNegative = ((thisIsNeg || n.isNegative) && !(thisIsNeg && n.isNegative)) ? true : false;//??? ÁÌ‡Í
+	return *this;
+}
+
+
+BigInt& BigInt::operator|=(const BigInt& n) 
+{
+	std::string bThis{ toBin(*this) }, bNum{ toBin(n) }, bRes{ };
+	int thisLen = bThis.length(), numLen = bNum.length(), maxLen = 0, shift = abs(thisLen - numLen);
+	bool thisIsLonger = false, thisIsNeg = false;
+	if (thisLen > numLen) {
+		maxLen = thisLen;
+		thisIsLonger = true;
+	}
+	else { maxLen = numLen; }
+
+	for (int i{ 0 }; i < maxLen; ++i) {
+		if (i < shift) {
+			if (thisIsLonger)
+				bRes += bThis[i];
+			else
+				bRes += bNum[i];
+		}
+		else {
+			if (thisIsLonger)
+				bRes += (bThis[i] - '0' || bNum[i - shift] - '0') + '0';
+			else
+				bRes += (bThis[i - shift] - '0' || bNum[i] - '0') + '0';
+		}
+	}
+	if (this->isNegative) thisIsNeg = true;
+	*this = toDec(bRes);
+	this->isNegative = ((thisIsNeg || n.isNegative) && !(thisIsNeg && n.isNegative)) ? true : false;//??? ÁÌ‡Í
+	return *this;
+}
 
 // unary +
 BigInt BigInt::operator+() const
@@ -242,7 +366,6 @@ bool BigInt::operator!=(const BigInt& n) const
 
 bool BigInt::operator<(const BigInt& n) const 
 {
-	//ÔÓÙËÍÒËÚ¸ 50<48 == 1 kek
 	int nLen= n.value.length(), thisLen= this->value.length(); 
 	if (thisLen < nLen && n.isNegative == this->isNegative) {
 		return (n.isNegative) ? false : true;
@@ -332,37 +455,33 @@ BigInt operator-(const BigInt& a , const BigInt& b)
 
 BigInt operator*(const BigInt& a, const BigInt& b) 
 {
-	BigInt res = BigInt(0);
-	BigInt fst = (a.isNegative) ? -a : a;
-	BigInt lim = (b.isNegative) ? -b : b;
-
-	for (int i{ 0 }; i < lim; ++i) {
-		res += fst;
-	}
-	return (a.isNegative != b.isNegative) ? -res : res;
+	return BigInt(a) *= b;
 }
 
 BigInt operator/(const BigInt& a, const BigInt& b) 
 {
-	if (b == BigInt(0)) throw std::invalid_argument("Division by zero.");
-	BigInt cnt = BigInt(0);
-	BigInt fst = (a.isNegative) ? -a : a;
-	BigInt snd = (b.isNegative) ? -b : b;
-
-	while (BigInt(0) <= (fst -= snd)) {++cnt;}
-	return (a.isNegative != b.isNegative) ? -cnt : cnt;
+	return BigInt(a) /= b;
 }
 
-//BigInt operator^(const BigInt&, const BigInt&) {}
+BigInt operator^(const BigInt& a, const BigInt& b) 
+{
+	return BigInt(a) ^= b;
+}
 
 BigInt operator%(const BigInt& a, const BigInt& b) 
 {
-	BigInt res = BigInt(a - (b * (a / b)));
-	return res;
+	return BigInt(a) %= b;
 }
 
-//BigInt operator&(const BigInt&, const BigInt&) {}
-//BigInt operator|(const BigInt&, const BigInt&) {}
+BigInt operator&(const BigInt& a, const BigInt& b) 
+{
+	return BigInt(a) &= b;
+}
+
+BigInt operator|(const BigInt& a, const BigInt& b) 
+{
+	return BigInt(a) |= b;
+}
 
 std::ostream& operator<<(std::ostream& o, const BigInt& i) 
 {

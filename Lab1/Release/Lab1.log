@@ -1,7 +1,7 @@
 ﻿  BigInt.cpp
-  Main.cpp
   Создание кода
-  Previous IPDB not found, fall back to full compilation.
-  All 179 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  9 of 387 functions ( 2.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    20 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
   Lab1.vcxproj -> D:\c++\OOP\Lab1\Release\Lab1.exe
