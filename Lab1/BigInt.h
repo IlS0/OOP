@@ -42,9 +42,12 @@ public:
 
 	size_t size() const;  // size in bytes
 
-//private:
 	std::string value;
 	bool isNegative;
+
+private:
+	BigInt& safePlus (const BigInt&);
+	BigInt& safeMinus(const BigInt&);
 };
 
 BigInt operator+(const BigInt&, const BigInt&);
@@ -57,7 +60,7 @@ BigInt operator&(const BigInt&, const BigInt&);
 BigInt operator|(const BigInt&, const BigInt&);
 
 
-std::ostream& operator<<(std::ostream& o, const BigInt& i);
+ std::ostream& operator<<(std::ostream& o, const BigInt& i);
 
 std::string toBin(const BigInt& n);
 BigInt toDec(const std::string n);
