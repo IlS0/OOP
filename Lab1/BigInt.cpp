@@ -55,13 +55,12 @@ std::string toBin(const BigInt& n)
 	return binNum;
 }
 
-
 BigInt toDec(const std::string n)
 {
 	int bLen= n.length();
 	BigInt pow = BigInt(1),decNum = BigInt(0),BI_two = BigInt(2);
 
-	for (int i{ bLen-2 }; i>=0;--i) {
+	for (int i{ bLen-2 }; i>=0;--i) {	
 		pow *= BI_two;
 		if (n[i]!='0')
 			decNum += pow;
@@ -70,8 +69,7 @@ BigInt toDec(const std::string n)
 	return decNum;
 }
 
-
-BigInt& BigInt:: operator=(const BigInt& n)
+BigInt& BigInt::operator=(const BigInt& n)
 {
 	this->isNegative = n.isNegative;
 	this->value = n.value;
@@ -83,7 +81,7 @@ BigInt BigInt::operator~() const
 	std::string bThis{ toBin(*this) };
 	int len = bThis.length();
 	for (int i{ 0 }; i < len; ++i) {
-		 bThis[i] = ~bThis[i];
+		 bThis[i] = ~(bThis[i]/*-'0'*/);
 	}
 	BigInt res = BigInt(toDec(bThis));
 	return res;
@@ -169,13 +167,60 @@ BigInt& BigInt::operator+=(const BigInt& n)
 
 BigInt& BigInt::operator*=(const BigInt& n) 
 {
+	int thisLen = this->value.length(), nLen = n.value.length(), limF{ 0 }, limS{ 0 },zeroCnt{ 0 };
+	std::string buf{}, fst{}, snd{};
 	BigInt res = BigInt(0);
-	BigInt fst = (this->isNegative) ? -(*this) : *this;
-	BigInt lim = (n.isNegative) ? -n : n;
-	for (int i{ 0 }; i < lim; ++i) { //ИНТ МЕНЬШЕ БИГИНТ?!?!!
-		res += fst;
+
+	if (thisLen < nLen) {
+		snd = this->value;
+		fst = n.value;
+		limF = nLen;
+		limS = thisLen;
+		zeroCnt = thisLen-1;
 	}
-	*this = (this->isNegative!=n.isNegative && !(res == BigInt(0))) ? -res : res;
+	else {
+		snd = n.value;
+		fst = this->value;
+		limF = thisLen;
+		limS = nLen;
+		zeroCnt = nLen-1;
+	}
+
+	for (int i{ limS -1}; i >= 0; --i) {
+		//тупое перемножение
+		for (int j{ limF - 1 }; j >= 0; --j) {
+			buf += ((fst[j] - '0') * (snd[i] - '0'));
+		}
+
+		//работа с переносами
+		for (int k{ 0 }; k < limF; ++k) {
+			if (buf[k] > 9) {
+				char f{ buf[k] / 10 }, s{ buf[k] % 10 };//возможно сделать инт?
+				buf[k] = s + '0';
+				if (k + 1 >= limF) {
+					buf += (f + '0');
+				}
+				else {
+					buf[k + 1] += f;
+				}
+			}
+			else {
+				buf[k] += '0';
+			}	
+		}
+		//получается обратная запись одного из слагаемых
+
+		//если результат - 0, то удаляем лишние
+		while (&buf.front() != &buf.back() && buf.back() == '0') { buf.pop_back(); }
+
+		reverse(buf.begin(), buf.end());
+		//добавление нулей к слагаемым
+		for (int k{ 0 }; k < zeroCnt -i; ++k) {buf.push_back('0');}
+		res += BigInt(buf);
+		buf.clear();
+	}
+
+	*this = (this->isNegative != n.isNegative && !(res == BigInt(0))) ? -res : res;
 	return *this;
 }
 
@@ -211,17 +256,17 @@ BigInt& BigInt::operator-=(const BigInt& n)
 	//вычисления и переносы b-a
 	for (int i = lim - 1; i >= 0; --i) {
 		if (b[i] - '0' >= a[i] - '0') {
-			buf += (b[i] - '0') - (a[i] - '0');
+			buf += ((b[i] - '0') - (a[i] - '0'))+'0';//!
 		}
 		else {
 			--b[i - 1];
 			b[i] =b[i]+ 10;
-			buf += (b[i] - '0') - (a[i] - '0');
+			buf += ((b[i] - '0') - (a[i] - '0'))+'0';//!!
 		}
 	}
 
-	int bufLen = buf.length();
-	for (int i = 0; i < bufLen; ++i) {buf[i] = ((buf[i]) + '0');}
+	//int bufLen = buf.length();
+	//for (int i = 0; i < bufLen; ++i) {buf[i] = ((buf[i]) + '0');}
 
 	//на случай, если останется 0 в начале. такое случается при вычитании однозначного из двухзначного
 	while (&buf.front()!=&buf.back() && buf.back()=='0') {buf.pop_back();}
@@ -287,7 +332,7 @@ BigInt& BigInt::operator%=(const BigInt& n)
 BigInt& BigInt::operator&=(const BigInt& n) 
 {
 	std::string bThis{ toBin(*this) }, bNum{ toBin(n) }, bRes{ };
-	int thisLen = bThis.length(), numLen = bNum.length(),maxLen = 0, shift = abs(thisLen- numLen);
+	int thisLen = bThis.length(), numLen = bNum.length(), maxLen{ 0 }, shift = abs(thisLen - numLen);
 	bool thisIsLonger = false, thisIsNeg = false;
 	if (thisLen > numLen) {
 		maxLen = thisLen;
@@ -307,7 +352,6 @@ BigInt& BigInt::operator&=(const BigInt& n)
 	this->isNegative = ((thisIsNeg || n.isNegative) && !(thisIsNeg && n.isNegative)) ? true : false;//??? знак
 	return *this;
 }
-
 
 BigInt& BigInt::operator|=(const BigInt& n) 
 {
@@ -393,28 +437,7 @@ bool BigInt::operator<(const BigInt& n) const
 
 bool BigInt::operator>(const BigInt& n) const 
 {	
-	int nLen= n.value.length() , thisLen= this->value.length(); 
-	if (thisLen > nLen && n.isNegative == this->isNegative) {
-		return (n.isNegative) ? false : true;
-	}
-	else if (thisLen == nLen && n.isNegative == this->isNegative) {
-		for (int i{ 0 }; i < nLen; ++i) {
-			if (this->value[i] > n.value[i]) {
-				return (n.isNegative) ? false : true;
-			}
-			else if(this->value[i] < n.value[i]){
-				return (n.isNegative) ? true : false;
-			}
-		}
-	}
-	//либо 1 < 2 по длине,либо разные знаки
-	else if (thisLen < nLen && n.isNegative == this->isNegative) {
-		return (n.isNegative) ? true : false;
-	}
-	else if (n.isNegative) {
-		return true;
-	}
-	return false;
+	return *this != n && !(this->operator<(n));
 }
 
 bool BigInt::operator<=(const BigInt& n) const
