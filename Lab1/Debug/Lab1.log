@@ -1,6 +1,0 @@
-﻿  BigInt.cpp
-  Main.cpp
-D:\c++\OOP\Lab1\Main.cpp(103,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-D:\c++\OOP\Lab1\Main.cpp(279,23): warning C4244: аргумент: преобразование "__int64" в "int", возможна потеря данных
-  Создание кода...
-  Lab1.vcxproj -> D:\c++\OOP\Lab1\Debug\Lab1.exe
