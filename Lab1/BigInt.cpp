@@ -299,12 +299,41 @@ BigInt& BigInt::operator-=(const BigInt& n)
 BigInt& BigInt::operator/=(const BigInt& n) 
 {
 	if (n == BigInt(0)) throw std::invalid_argument("Division by zero.");
-	BigInt cnt = BigInt(0);
-	BigInt fst = (this->isNegative) ? -(*this) : *this;
-	BigInt snd = (n.isNegative) ? -n : n;
+	if (n == BigInt(1)) return *this;
+	if (n == BigInt(-1)) {
+		*this = -*this;
+		return *this;
+	}
+	BigInt fst = (this->isNegative) ? -(*this) : *this,
+		snd = (n.isNegative) ? -n : n, res=BigInt(0);
 
-	while (BigInt(0) <= (fst -= snd)) {++cnt;}
-	*this = (this->isNegative != n.isNegative && !(cnt == BigInt(0))) ? -cnt : cnt;
+	//делимое меньше делителя по модулю => сразу 0
+	if (fst < snd) {
+		*this = BigInt(0);
+		return *this;
+	}
+	
+	int zeroAmount = fst.value.length()-snd.value.length();
+	BigInt tenPow = BigInt(1), BI_ten = BigInt(10),tmp =BigInt(0);
+
+	for (int i{ 0 }; i < zeroAmount; ++i) { tenPow *= BI_ten;}
+
+	while (fst >= snd) {
+		for (BigInt i = BigInt(1); i <= BI_ten; ++i) {
+			if (tenPow * snd * i > fst) {
+				tmp = (--i) * tenPow;
+				break;
+			}
+		}
+		fst -= tmp * snd;
+		res += tmp;
+		tenPow.value.erase(tenPow.value.end()-1);
+		if (tenPow.value.empty()) {
+			break;
+		}
+	}
+
+	*this = (this->isNegative != n.isNegative && !(res == BigInt(0))) ? -res : res;
 	return *this;
 }
 
@@ -338,7 +367,7 @@ BigInt& BigInt::operator^=(const BigInt& n)
 
 BigInt& BigInt::operator%=(const BigInt& n) 
 {
-	*this = (*this)-(n*(*this / n));
+	*this -= (n*(*this / n));
 	return *this;
 }
 
@@ -447,7 +476,7 @@ bool BigInt::operator<(const BigInt& n) const
 
 bool BigInt::operator>(const BigInt& n) const 
 {	
-	return *this != n && !(this->operator<(n));
+	return n < *this;
 }
 
 bool BigInt::operator<=(const BigInt& n) const
@@ -475,8 +504,6 @@ size_t BigInt::size() const
 {
 	return sizeof(isNegative) + this->value.size();
 }
-
-
 
 BigInt operator+(const BigInt& a, const BigInt& b) 
 {
