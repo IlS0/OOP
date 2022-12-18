@@ -1,8 +1,7 @@
-#include <iostream>
-#include "Field.h"
+//#include <iostream>//*****
+#include "Game.h"
 
-int main() {
-
-	Field test = Field(5, 5);
-	std::cout << test;
+int main(int argc, char* argv[]) {
+	Game game = (argc > 1) ? Game(Args(argv[1])) : Game();
+	game.gameLoop();
 }
