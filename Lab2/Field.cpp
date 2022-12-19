@@ -1,6 +1,4 @@
 #include "Field.h"
-//#include <iostream>
-
 
 Field::Field(int x, int y )
 {
@@ -15,52 +13,55 @@ Field::Field() : Field(15, 15) {}
 Field::~Field(){}
 
 
-char Field::newPointVal(const int& y, const int& x)
+char Field::newPointVal(const int& y, const int& x, const std::vector<int>& birthConds, const std::vector<int>& survConds)
 {
 	//создать замкнутое поле
 	char neighborCnt = field[y - 1][x - 1]+ field[y - 1][x]+ field[y - 1][x + 1]+ field[y][x - 1]
 		+ field[y][x + 1]+ field[y + 1][x - 1]+ field[y + 1][x]+ field[y + 1][x + 1];
 
-	switch (neighborCnt)
-	{
-		case 3: 
-			return 1;
-		case 2:
-			return field[y][x];
-		default: return 0;
+	auto i = birthConds.begin();
+	for (i; i != birthConds.end(); ++i) {
+		if (neighborCnt == *i && (*i!=0)) return 1;
 	}
 
+	auto j= survConds.begin();
+	for (j; j != survConds.end(); ++j) {
+		if (neighborCnt == *j && (*j != 0)) return field[y][x];
+	}
+
+	return 0;
 }
 
 
-
-void Field::update()
+void Field::update(const std::vector<int>& birthConds, const std::vector<int>& survConds)
 {	
 	//сделать замкнутое поле
 	std::vector<std::vector<char>> newField = field;
 	for (int y{ 1 }; y < sizeY; ++y) {
 		for (int x{ 1 }; x < sizeX; ++x) {
-			newField[y][x] = newPointVal(y, x);
+			newField[y][x] = newPointVal(y, x, birthConds, survConds);
 		}
 	}
 	field = newField;
 }
 
 
-void Field::setVal(const int& x, const int& y)
-{
-	field[y][x] = 1;
-}
+void Field::setVal(const int& x, const int& y){ field[y][x] = 1; }
 
+int Field::getVal(const int& y, const int& x) { return field[y][x]; }
+
+int Field::getSizeX() { return sizeX; }
+
+int  Field::getSizeY(){ return sizeY; }
 
 std::ostream& operator<<(std::ostream& o, const Field& i)
 {
 	for (int y{ 0 }; y < i.sizeX; ++y) {
-		for (int x{ 0 }; x < i.sizeY; ++x) {
+		for (int x{ 0/**/ }; x < i.sizeY; ++x) {
 			(!i.field[y][x]) ? o << " " << " " : o << '#' << " ";
 		}
 		o << std::endl;
 	}
-	o << "_______________________________" << std::endl;
+	//o << "_______________________________" << std::endl;
 	return o;
 }
