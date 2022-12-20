@@ -21,6 +21,7 @@ private:
 	int sizeY;
 	std::vector<std::vector<char>> field;
 	char newPointVal(const int&, const int&, const std::vector<int>&, const std::vector<int>&);
+	int pointMod(const int&, const int&);
 };
 
 

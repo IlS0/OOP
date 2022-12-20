@@ -17,8 +17,13 @@ public:
 
 		std::string buf;
 		getline(fin, buf);
-		name = buf.substr(3);
-
+		try {
+			name = buf.substr(3);
+		}
+		catch (std::out_of_range) {
+			std::cerr << "There is no an universe name in the input file.";
+			exit(1);
+		}
 		getline(fin, buf);
 		bool isSurvCond = false;
 		for (auto i = buf.begin(); i != buf.end(); ++i) {

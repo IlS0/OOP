@@ -1,5 +1,4 @@
 #include "Game.h"
-//#include <iostream>
 
 Game::Game(const FileArgs& universe, const char mode) {
 	gameMode = mode;
@@ -8,6 +7,7 @@ Game::Game(const FileArgs& universe, const char mode) {
 	survConds = universe.survConds;
 	field = Field(universe.sizeX,universe.sizeY);
 	for (auto i = universe.points.begin(); i != universe.points.end(); ++i) {
+
 		field.setVal(std::get<0>(*i), std::get<1>(*i));
 	}
 };
@@ -19,8 +19,8 @@ Game::Game() {
 	birthConds = { 3 };
 	survConds = { 2, 3 };
 	field = Field();
-	//дефолтное поле с бесконечно-живущей фигурой
-	//заменить на возможность рисовать с интерфейса
+
+	//дефолтное поле 15x15 с бесконечно-живущей фигурой
 	field.setVal(4, 5);
 	field.setVal(5, 5);
 	field.setVal(6, 5);
@@ -72,13 +72,11 @@ void Game::gameLoop(const int& iters, const std::string& output)
 	}
 
 	if (gameMode == DEFAULT_MODE) {
-		/*std::cout << "This gamemode is under development." << std::endl << "Run the app with the arguments.";
-		return;*/
 		std::cout << "There are no arguments. Game parameters have been set to default." << std::endl;
 	}
 
-	
 	std::cout << "Game> Enter a command. Type \"help\" to get the command-list." << std::endl;
+	std::cout << std::endl;
 	std::cout << "User>";
 	while (getline(std::cin,command)) {
 		if (command == "exit") {
@@ -90,17 +88,19 @@ void Game::gameLoop(const int& iters, const std::string& output)
 			std::cout << " dump <filename>         saves a universe as a txt, string arg, no default value" << std::endl;
 			std::cout << " tick <n>                updates a field n times, int arg, 1 is default value" << std::endl;
 			std::cout << " exit                    ends the game" << std::endl;
+			std::cout << std::endl;
 		}
-		else if (command.substr(0, 5) == "dump ") {
+		else if (command.substr(0, 4) == "dump") {
 			try {
 				saveUniverse(command.substr(5));
 			}
 			catch (std::out_of_range) {
-				std::cerr << "Invalid name of the output file. Default name has been set." << std::endl;
+				std::cerr << "Game> No output file. The file has been created with default name." << std::endl;
 				saveUniverse("Output.txt");
 			}
+			std::cout << std::endl;
 		}
-		else if (command.substr(0,5) == "tick ") {
+		else if (command.substr(0,4) == "tick") {
 			try {
 				buf = command.substr(5);
 				ticks = stoi(buf);
@@ -120,10 +120,11 @@ void Game::gameLoop(const int& iters, const std::string& output)
 			for (int i{ 0 }; i < ticks; ++i) {
 				field.update(birthConds, survConds);
 			}
-			std::cout << *this << std::endl;
+			std::cout << *this;
 		}
 		else {
 			std::cerr << "Game> Invalid command. Use \"help\" to get the command-list." << std::endl;
+			std::cout << std::endl;
 		}
 		std::cout << "User>";
 	}
@@ -131,8 +132,8 @@ void Game::gameLoop(const int& iters, const std::string& output)
 
 
 std::ostream& operator<<(std::ostream& o, const Game& i) {
-	o << i.name << std::endl;
-	o << "B";
+	o <<" "<<i.name << std::endl;
+	o << " B";
 	for (auto j = i.birthConds.begin(); j != i.birthConds.end(); ++j) {
 		o << (*j);
 	}
@@ -141,7 +142,6 @@ std::ostream& operator<<(std::ostream& o, const Game& i) {
 		o << (*j);
 	}
 	o << std::endl << i.field<<std::endl;
-	o << "_______________________________" << std::endl;
 	return o;
 }
 

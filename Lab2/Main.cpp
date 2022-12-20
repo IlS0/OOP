@@ -1,11 +1,7 @@
 #include "Game.h"
 
 
-int main(int argc, char* argv[]) {
-	//Game game = Game();///?
-	//std::cout << argc<<std::endl;
-	//argv[2 или 3] - итерации
-	//argv[3 или 4] - аутпут
+int main(int argc, char* argv[]) {	
 	switch (argc)
 	{
 	case 1: {
@@ -24,7 +20,6 @@ int main(int argc, char* argv[]) {
 		int iters{ -1 };
 		std::string out;
 		for (int i{ 1 }; i < argc-1; ++i) {
-			//std::cout << argv[i] << std::endl;
 			if (!strcmp(argv[i], "-i")) {
 				iters = atoi(argv[i + 1]);
 				if (argv[i + 1] != std::to_string(iters)) {
